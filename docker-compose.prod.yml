@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:15
+    container_name: db_webapp
+    env_file:
+      - .env
+    volumes:
+      - webapp_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    # no ports — internal only
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backend_webapp
+    env_file:
+      - .env
+    restart: unless-stopped
+    # no ports — only nginx reaches it, no volumes — code baked into image
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: nginx_webapp
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  webapp_postgres_data:
