@@ -43,6 +43,18 @@ services:
       - backend
     restart: unless-stopped
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_webapp_dev
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
 volumes:
   webapp_postgres_data:
   frontend_node_modules:

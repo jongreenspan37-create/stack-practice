@@ -6,6 +6,7 @@ from app.database import get_db
 from app.users.crud import get_selected_users, get_all_users, get_user, create_role
 from app.users.crud import create_user, login_user
 from app.dependencies import get_current_user, require_admin
+from app.users.models import User
 
 
 router = APIRouter(prefix="/api/users")
@@ -16,7 +17,7 @@ async def list_selected_users(db: AsyncSession = Depends(get_db)):
 
 @router.get("/list/all", response_model=list[UserResponseBasic])  
 async def list_users(db: AsyncSession = Depends(get_db), 
-                        current_user: Depends(get_current_user)):
+                        current_user: User=Depends(get_current_user)):
     return await get_all_users(db)
 
 @router.get("/{user_id}", response_model=UserResponse)
@@ -29,7 +30,7 @@ async def user_info(user_id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/roles", response_model=RoleResponse)
 async def add_role(role: RoleCreate, 
                    db: AsyncSession = Depends(get_db), 
-                   current_user=Depends(require_admin)):
+                   current_user: User=Depends(require_admin)):
     
         
     return await create_role(db, role)
