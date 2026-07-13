@@ -7,19 +7,24 @@ services:
     volumes:
       - webapp_postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5433"
+      - "5433:5432"
     restart: unless-stopped
 
   backend:
     build:
       context: ./backend
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     container_name: backend_webapp
     env_file:
       - .env
     volumes:
       - ./backend/app:/code/app
+      - ./backend/alembic:/code/alembic
+      - ./backend/alembic.ini:/code/alembic.ini
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       - db
     restart: unless-stopped
@@ -33,7 +38,7 @@ services:
       - frontend_node_modules:/app/node_modules
     command: npm run dev -- --host
     ports:
-      - "5173:5173"
+      - "5174:5173"
     depends_on:
       - backend
     restart: unless-stopped
